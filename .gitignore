@@ -1,0 +1,44 @@
+# ================================
+# TaskFlow AI — Frontend .gitignore
+# ================================
+
+# ── Environment Files (NEVER push these) ──
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+
+# ── Dependencies ──
+node_modules/
+
+# ── Next.js Build Output ──
+.next/
+out/
+build/
+dist/
+
+# ── TypeScript ──
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Logs ──
+*.log
+npm-debug.log*
+logs/
+
+# ── OS Files ──
+.DS_Store
+Thumbs.db
+
+# ── Editor ──
+.vscode/
+.idea/
+
+# ── Vercel ──
+.vercel
+
+# ── Misc ──
+.cache/
+coverage/
