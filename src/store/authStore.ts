@@ -7,6 +7,7 @@ interface AuthState {
   token: string | null
   isLoading: boolean
   isAuthenticated: boolean
+  isInitialized: boolean
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string, role?: string) => Promise<void>
   logout: () => void
@@ -14,18 +15,28 @@ interface AuthState {
   initAuth: () => void
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isLoading: false,
   isAuthenticated: false,
+  isInitialized: false,
 
   initAuth: () => {
     if (typeof window === 'undefined') return
     const token = localStorage.getItem('token')
-    const user = localStorage.getItem('user')
-    if (token && user) {
-      set({ token, user: JSON.parse(user), isAuthenticated: true })
+    const userStr = localStorage.getItem('user')
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        set({ token, user, isAuthenticated: true, isInitialized: true })
+      } catch {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        set({ isInitialized: true })
+      }
+    } else {
+      set({ isInitialized: true })
     }
   },
 
@@ -35,7 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data } = await api.post('/auth/login', { email, password })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      set({ user: data.user, token: data.token, isAuthenticated: true })
+      set({ user: data.user, token: data.token, isAuthenticated: true, isInitialized: true })
     } finally {
       set({ isLoading: false })
     }
@@ -47,7 +58,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data } = await api.post('/auth/register', { name, email, password, role })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      set({ user: data.user, token: data.token, isAuthenticated: true })
+      set({ user: data.user, token: data.token, isAuthenticated: true, isInitialized: true })
     } finally {
       set({ isLoading: false })
     }
@@ -56,7 +67,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    set({ user: null, token: null, isAuthenticated: false })
+    set({ user: null, token: null, isAuthenticated: false, isInitialized: true })
     window.location.href = '/login'
   },
 
