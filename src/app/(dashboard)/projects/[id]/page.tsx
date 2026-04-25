@@ -90,7 +90,7 @@ export default function ProjectDetailPage() {
 
  
   if (notFound) return (
-    <div className="p-8 text-center">
+    <div className="p-8 text-center">``
       <p className="text-text-secondary mb-4">Project not found or you don't have access.</p>
       <button onClick={() => router.push('/projects')} className="btn-primary">
         Back to Projects
