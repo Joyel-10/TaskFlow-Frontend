@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation'
+import Router from "next/router";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
 import type { Project } from "@/types";
@@ -26,6 +27,7 @@ import ProjectModal from "@/components/projects/ProjectModal";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const router = useRouter() 
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
