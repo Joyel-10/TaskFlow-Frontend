@@ -1,23 +1,22 @@
 'use client'
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/store/authStore'
+import { useRouter, usePathname } from 'next/navigation'
 
 export default function Home() {
   const router = useRouter()
-  const { isAuthenticated, initAuth } = useAuthStore()
+  const pathname = usePathname()
 
   useEffect(() => {
-    initAuth()
-  }, [initAuth])
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard')
-    } else {
-      router.replace('/login')
+    // Only redirect when on exact root path /
+    if (pathname === '/') {
+      const token = localStorage.getItem('token')
+      if (token) {
+        router.replace('/dashboard')
+      } else {
+        router.replace('/login')
+      }
     }
-  }, [isAuthenticated, router])
+  }, [router, pathname])
 
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center">
