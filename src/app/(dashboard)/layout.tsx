@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useAuthStore } from '@/store/authStore'
 import { getInitials, generateAvatarColor } from '@/lib/utils'
 import {
   LayoutDashboard, FolderKanban, CheckSquare,
@@ -21,20 +20,38 @@ const NAV = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { user, isAuthenticated, isInitialized, initAuth, logout } = useAuthStore()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    initAuth()
-  }, [initAuth])
+    // Read directly from localStorage — no Zustand timing issues
+    const token = localStorage.getItem('token')
+    const userStr = localStorage.getItem('user')
 
-  useEffect(() => {
-    if (isInitialized && !isAuthenticated) {
+    if (!token || !userStr) {
+      router.replace('/login')
+      return
+    }
+
+    try {
+      const parsedUser = JSON.parse(userStr)
+      setUser(parsedUser)
+      setReady(true)
+    } catch {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
       router.replace('/login')
     }
-  }, [isInitialized, isAuthenticated, router])
+  }, [router])
 
-  if (!isInitialized) return (
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    window.location.href = '/login'
+  }
+
+  if (!ready || !user) return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center">
       <div className="flex items-center gap-3">
         <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
@@ -42,8 +59,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     </div>
   )
-
-  if (!user) return null
 
   const avatarColor = generateAvatarColor(user.name)
 
@@ -58,7 +73,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Sidebar */}
       <aside className={`fixed top-0 left-0 h-full w-64 bg-bg-secondary border-r border-bg-border flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        {/* Logo */}
         <div className="flex items-center gap-3 p-5 border-b border-bg-border">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center shadow-glow-purple flex-shrink-0">
             <Zap className="w-4 h-4 text-white" />
@@ -69,7 +83,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <p className="text-xs font-semibold text-text-muted uppercase tracking-wider px-3 mb-3">
             Workspace
@@ -100,16 +113,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Settings className="w-4 h-4" /> Settings
             </Link>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="sidebar-link w-full text-left hover:text-red-400">
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
           </div>
         </nav>
 
-        {/* User */}
         <div className="p-4 border-t border-bg-border">
-          <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
               style={{ backgroundColor: avatarColor }}>
@@ -123,9 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* Main */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
-        {/* Top bar */}
         <header className="sticky top-0 z-30 bg-bg-primary/80 backdrop-blur-md border-b border-bg-border px-4 lg:px-6 py-3 flex items-center gap-4">
           <button
             className="lg:hidden text-text-secondary hover:text-text-primary"

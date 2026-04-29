@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' })
 export const metadata: Metadata = {
   title: 'TaskFlow AI – Intelligent Project Management',
   description: 'AI-powered project management for modern teams',
-  icons: { icon: '/favicon.ico' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
