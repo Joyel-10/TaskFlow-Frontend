@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import api from '@/lib/api'
 import type { Project, Task, User } from '@/types'
@@ -12,8 +12,8 @@ import AITaskGenerator from '@/components/ai/AITaskGenerator'
 
 const COLUMNS = ['todo', 'in-progress', 'done'] as const
 
-export default function ProjectDetailPage() {
-  const { id } = useParams<{ id: string }>()
+export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+  const id = params.id
   const router = useRouter()
   const [project, setProject] = useState<Project | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
@@ -27,6 +27,7 @@ export default function ProjectDetailPage() {
   const [notFound, setNotFound] = useState(false)
 
   const fetchData = useCallback(async () => {
+    if (!id) return
     try {
       setLoading(true)
       const [projRes, tasksRes] = await Promise.all([
