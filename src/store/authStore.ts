@@ -46,12 +46,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { data } = await api.post('/auth/login', { email, password })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      set({
-        user: data.user,
-        token: data.token,
-        isAuthenticated: true,
-        isInitialized: true
-      })
+      document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
+      set({ user: data.user, token: data.token, isAuthenticated: true, isInitialized: true })
     } finally {
       set({ isLoading: false })
     }
@@ -63,12 +59,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { data } = await api.post('/auth/register', { name, email, password, role })
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      set({
-        user: data.user,
-        token: data.token,
-        isAuthenticated: true,
-        isInitialized: true
-      })
+      document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`
+      set({ user: data.user, token: data.token, isAuthenticated: true, isInitialized: true })
     } finally {
       set({ isLoading: false })
     }
@@ -77,12 +69,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    set({
-      user: null,
-      token: null,
-        isAuthenticated: false,
-      isInitialized: true
-    })
+    document.cookie = 'token=; path=/; max-age=0'
+    set({ user: null, token: null, isAuthenticated: false, isInitialized: true })
     window.location.href = '/login'
   },
 

@@ -25,15 +25,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    // Read directly from localStorage — no Zustand timing issues
     const token = localStorage.getItem('token')
     const userStr = localStorage.getItem('user')
-
     if (!token || !userStr) {
       router.replace('/login')
       return
     }
-
     try {
       const parsedUser = JSON.parse(userStr)
       setUser(parsedUser)
@@ -48,6 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    document.cookie = 'token=; path=/; max-age=0'
     window.location.href = '/login'
   }
 
@@ -65,16 +63,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-bg-primary flex">
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)} />
       )}
-
-      {/* Sidebar */}
       <aside className={`fixed top-0 left-0 h-full w-64 bg-bg-secondary border-r border-bg-border flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center gap-3 p-5 border-b border-bg-border">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center shadow-glow-purple flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center flex-shrink-0">
             <Zap className="w-4 h-4 text-white" />
           </div>
           <span className="text-lg font-bold text-text-primary tracking-tight">TaskFlow AI</span>
@@ -82,17 +76,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <X className="w-5 h-5 text-text-muted" />
           </button>
         </div>
-
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider px-3 mb-3">
-            Workspace
-          </p>
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider px-3 mb-3">Workspace</p>
           {NAV.map(({ href, icon: Icon, label }) => {
             const isActive = pathname === href || pathname.startsWith(href + '/')
             return (
-              <Link
-                key={href}
-                href={href}
+              <Link key={href} href={href}
                 className={`sidebar-link ${isActive ? 'active' : ''}`}
                 onClick={() => setSidebarOpen(false)}>
                 <Icon className="w-4 h-4 flex-shrink-0" />
@@ -101,29 +90,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             )
           })}
-
           <div className="pt-4 mt-4 border-t border-bg-border">
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider px-3 mb-3">
-              Account
-            </p>
-            <Link
-              href="/settings"
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider px-3 mb-3">Account</p>
+            <Link href="/settings"
               className={`sidebar-link ${pathname === '/settings' ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}>
               <Settings className="w-4 h-4" /> Settings
             </Link>
-            <button
-              onClick={handleLogout}
-              className="sidebar-link w-full text-left hover:text-red-400">
+            <button onClick={handleLogout} className="sidebar-link w-full text-left hover:text-red-400">
               <LogOut className="w-4 h-4" /> Sign Out
             </button>
           </div>
         </nav>
-
         <div className="p-4 border-t border-bg-border">
           <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-bg-hover transition-colors">
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
               style={{ backgroundColor: avatarColor }}>
               {getInitials(user.name)}
             </div>
@@ -134,12 +115,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </aside>
-
-      {/* Main */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         <header className="sticky top-0 z-30 bg-bg-primary/80 backdrop-blur-md border-b border-bg-border px-4 lg:px-6 py-3 flex items-center gap-4">
-          <button
-            className="lg:hidden text-text-secondary hover:text-text-primary"
+          <button className="lg:hidden text-text-secondary hover:text-text-primary"
             onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5" />
           </button>
@@ -149,17 +127,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-accent-purple rounded-full" />
           </button>
           <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
               style={{ backgroundColor: avatarColor }}>
               {getInitials(user.name)}
             </div>
-            <span className="text-sm font-medium text-text-primary hidden sm:block">
-              {user.name}
-            </span>
+            <span className="text-sm font-medium text-text-primary hidden sm:block">{user.name}</span>
           </div>
         </header>
-
         <main className="flex-1 overflow-auto">
           {children}
         </main>

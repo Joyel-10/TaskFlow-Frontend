@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, use } from 'react' 
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import api from '@/lib/api'
@@ -10,10 +10,12 @@ import TaskModal from '@/components/tasks/TaskModal'
 import AddMemberModal from '@/components/projects/AddMemberModal'
 import AITaskGenerator from '@/components/ai/AITaskGenerator'
 
+
+
 const COLUMNS = ['todo', 'in-progress', 'done'] as const
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const id = params.id
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)  // ← unwrap with use()
   const router = useRouter()
   const [project, setProject] = useState<Project | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
