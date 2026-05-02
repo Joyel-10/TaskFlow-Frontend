@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       localStorage.removeItem('user')
       router.replace('/login')
     }
-  }, [router])
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
