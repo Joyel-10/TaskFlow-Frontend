@@ -7,9 +7,7 @@ export default function Home() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // ONLY redirect when exactly on /
     if (pathname !== '/') return
-    
     const token = localStorage.getItem('token')
     if (token) {
       router.replace('/dashboard')
@@ -18,5 +16,12 @@ export default function Home() {
     }
   }, [router, pathname])
 
-  return null
+  return (
+    <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+      <div className="flex items-center gap-3">
+        <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
+        <span className="text-text-secondary">Loading...</span>
+      </div>
+    </div>
+  )
 }
