@@ -23,6 +23,11 @@ api.interceptors.response.use(
       localStorage.removeItem('user')
       window.location.href = '/login'
     }
+    // Log network errors for debugging
+    if (!err.response) {
+      console.error('Network error - API unreachable:', err.message)
+      console.error('API URL:', API_URL)
+    }
     return Promise.reject(err)
   }
 )

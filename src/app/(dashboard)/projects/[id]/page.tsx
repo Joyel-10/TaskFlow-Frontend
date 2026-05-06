@@ -39,11 +39,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       setProject(projRes.data.project)
       setTasks(tasksRes.data.tasks)
     } catch (err: unknown) {
-      const error = err as { response?: { status?: number } }
+      const error = err as { response?: { status?: number; data?: { message?: string } }; message?: string }
       if (error.response?.status === 404 || error.response?.status === 403) {
         setNotFound(true)
       } else {
-        toast.error('Failed to load project')
+        const errorMsg = error.response?.data?.message || error.message || 'Failed to load project'
+        toast.error(errorMsg)
+        console.error('Project fetch error:', error)
       }
     } finally {
       setLoading(false)
