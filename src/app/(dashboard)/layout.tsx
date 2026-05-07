@@ -25,6 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
+    console.log("Layout useEffect triggered");
     const token = localStorage.getItem('token')
     const userStr = localStorage.getItem('user')
     if (!token || !userStr) {
