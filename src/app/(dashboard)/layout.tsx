@@ -23,41 +23,46 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [user, setUser] = useState<{ name: string; role: string } | null>(null)
   const [ready, setReady] = useState(false)
+  const [mounted, setMounted] = useState(false) // Add this new state
 
   useEffect(() => {
-    console.log("Layout useEffect triggered");
+    setMounted(true) // Set mounted to true immediately
+    
     const token = localStorage.getItem('token')
     const userStr = localStorage.getItem('user')
+
     if (!token || !userStr) {
       router.replace('/login')
       return
     }
+
     try {
       const parsedUser = JSON.parse(userStr)
       setUser(parsedUser)
       setReady(true)
-    } catch {
+    } catch (error) {
+      console.error("Auth Parse Error:", error)
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       router.replace('/login')
     }
-  }, [])
+  }, [router])
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    document.cookie = 'token=; path=/; max-age=0'
-    window.location.href = '/login'
-  }
+  // Prevent hydration mismatch by returning null or a loader until mounted
+  if (!mounted) return null 
 
-  if (!ready || !user) return (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-      <div className="flex items-center gap-3">
-        <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
-        <span className="text-text-secondary">Loading...</span>
+  if (!ready || !user) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-accent-purple border-t-transparent rounded-full animate-spin" />
+          <span className="text-text-secondary">Verifying Session...</span>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+  
+  // ... rest of your return code
 
   const avatarColor = generateAvatarColor(user.name)
 
