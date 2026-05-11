@@ -48,7 +48,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [router])
 
-  // Prevent hydration mismatch by returning null or a loader until mounted
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    document.cookie = 'token=; path=/; max-age=0'
+    router.replace('/login')
+  }
+
+ 
   if (!mounted) return null 
 
   if (!ready || !user) {
@@ -62,7 +69,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
   
-  // ... rest of your return code
+
 
   const avatarColor = generateAvatarColor(user.name)
 
